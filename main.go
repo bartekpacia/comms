@@ -9,11 +9,11 @@ import (
 
 func main() {
 	options := serial.OpenOptions{
-		PortName:        "/dev/tty.usbserial-141230",
+		PortName:        "/dev/tty.usbserial-141210",
 		BaudRate:        9600,
 		DataBits:        8,
 		StopBits:        1,
-		MinimumReadSize: 8,
+		MinimumReadSize: 1,
 		ParityMode:      serial.PARITY_NONE,
 	}
 
@@ -25,12 +25,12 @@ func main() {
 	defer port.Close()
 
 	for {
-		b := make([]byte, 8)
+		b := make([]byte, 1)
 		n, err := port.Read(b)
 		if err != nil {
 			log.Fatalf("error reading from serial port: %v\n", err)
 		}
 
-		fmt.Printf("read %d bytes: %d\n", n, b[0])
+		fmt.Println("bytes read:", n, "value:", b[0])
 	}
 }
