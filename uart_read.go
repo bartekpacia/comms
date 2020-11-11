@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -8,22 +9,33 @@ import (
 )
 
 var (
-	options = serial.OpenOptions{
-		PortName:        "/dev/tty.usbserial-141210",
-		BaudRate:        9600,
-		DataBits:        8,
-		StopBits:        1,
-		MinimumReadSize: 1,
-		ParityMode:      serial.PARITY_NONE,
-	}
+	portName   string
+	baudRate   uint
+	dataBits   uint
+	stopBits   uint
+	parityMode int
 )
 
+func init() {
+	Bootstrap()
+}
+
 func main() {
+	flag.Parse()
+
+	options := serial.OpenOptions{
+		PortName:        portName,
+		BaudRate:        baudRate,
+		DataBits:        dataBits,
+		StopBits:        stopBits,
+		MinimumReadSize: 1,
+		ParityMode:      serial.ParityMode(parityMode),
+	}
+
 	port, err := serial.Open(options)
 	if err != nil {
 		log.Fatalf("error opening serial port: %v\n", err)
 	}
-
 	defer port.Close()
 
 	for {
