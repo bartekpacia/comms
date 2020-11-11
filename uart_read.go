@@ -7,8 +7,8 @@ import (
 	"github.com/jacobsa/go-serial/serial"
 )
 
-func main() {
-	options := serial.OpenOptions{
+var (
+	options = serial.OpenOptions{
 		PortName:        "/dev/tty.usbserial-141210",
 		BaudRate:        9600,
 		DataBits:        8,
@@ -16,7 +16,9 @@ func main() {
 		MinimumReadSize: 1,
 		ParityMode:      serial.PARITY_NONE,
 	}
+)
 
+func main() {
 	port, err := serial.Open(options)
 	if err != nil {
 		log.Fatalf("error opening serial port: %v\n", err)
