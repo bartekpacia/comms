@@ -1,4 +1,4 @@
-module github.com/bartekpacia/uart
+module github.com/bartekpacia/comms/uart_leds
 
 go 1.15
 
