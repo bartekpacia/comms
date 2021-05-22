@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/jacobsa/go-serial/serial"
 )
@@ -45,37 +42,44 @@ func main() {
 	}
 	defer port.Close()
 
-	fmt.Println("uart_echo: a tiny program that sends a byte to")
-	fmt.Println("uart_echo: a microcontroller and then receives")
-	fmt.Println("uart_echo: the very same byte.")
+	fmt.Print("uart_echo: a tiny program that sends a byte to ")
+	fmt.Printf("microcontroller and then receives ")
+	fmt.Printf("the very same byte.\n")
+	fmt.Println("uart_echo: enter -1 to stop")
 
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("enter a single byte: ")
-		text, err := reader.ReadString('\n')
+		var value int
+		fmt.Print("enter a single byte to be sent (integer, 0-255): ")
+		_, err := fmt.Scanf("%d", &value)
 		if err != nil {
 			log.Fatalln("error reading from stdin:", err)
 		}
 
-		if strings.TrimSpace(text) == "STOP" {
+		if value == -1 {
 			break
 		}
 
-		b := []byte(text)[0]
-		n, err := port.Write([]byte{b})
+		if value < 0 || value > 255 {
+			fmt.Printf("uart_echo: error: %d overflows byte\n", value)
+			break
+		}
+
+		inputByte := byte(value)
+		fmt.Printf("\"%b\" will be sent\n", inputByte)
+		n, err := port.Write([]byte{inputByte})
 		if err != nil {
 			log.Fatalln("error writing to serial port:", err)
 		}
-		fmt.Printf("wrote %d bytes to serial port (%d)\n", n, b)
+		fmt.Printf("wrote %d bytes (\"%d\") to serial port\n", n, inputByte)
 
 		output := make([]byte, 1)
 		n, err = port.Read(output)
 		if err != nil {
 			log.Fatalln("error reading from serial port:", err)
 		}
-		b = output[0]
+		outputByte := output[0]
 
-		fmt.Printf("read %d bytes from serial port (%d)\n", n, b)
+		fmt.Printf("read %d bytes (\"%d\") from serial port \n", n, outputByte)
 	}
 
 	fmt.Println("finished :)")
